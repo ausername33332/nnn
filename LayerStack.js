@@ -9,6 +9,7 @@ class LayerStack {
   async a(input, weights = this.weights) {
     let state = input
     for (let i = 0; i < this.layers.length; i++) {
+      state = normalize(state, this.layers[i].n.length)
       state = await this.layers[i].a(state, weights[i])
     }
     return state
@@ -34,7 +35,7 @@ class LayerStack {
       let orig = await this.a(batch, this.weights)
       let loss = measure(res, [target])
       let origLoss = measure(orig, [target])
-      if (j % 70 == 0) l('@', j, ': l: ', origLoss[0].toFixed(8), ' t: ', target.toFixed(8), ' o: ', orig[0].toFixed(8), ' lb: ', batch[batch.length - 1].toFixed(8))
+      if (j % 100 == 0) l('@', j, ': l: ', origLoss[0].toFixed(8), ' t: ', target.toFixed(8), ' o: ', orig[0].toFixed(8), ' lb: ', batch[batch.length - 1].toFixed(8))
       if (j === 0) continue;
       if (loss < this.lastLoss) {
         for (let i in this.layers) {
@@ -65,7 +66,7 @@ class LayerStack {
   }
   async predict(batch, cb = null) {
     if (!cb) {
-      return await this.a(this.weights)
+      return await this.a(batch, this.weights)
     }
     let res = await this.a(batch, this.weights)
     let ans = await cb(res)

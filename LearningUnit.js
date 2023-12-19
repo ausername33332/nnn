@@ -1,5 +1,10 @@
-class LifeBeing extends EventEmitter {
+const { EventEmitter } = require('events')
+const { generateBatches } = require('./tools')
+
+class LearningUnit extends EventEmitter {
   constructor(brain, inputDSize, outputDSize) {
+    super()
+    this.name = rStr(5)
     this.brain = brain
     this.buffer = new Map()
     this.target = []
@@ -9,7 +14,7 @@ class LifeBeing extends EventEmitter {
     this.isLifeBeing = true
     this.interactive = Math.random()
     this.memory = new Map()
-    this.learnConst = Math.random() * (Math.random() * (Math.random() * .01))
+    this.lc = Math.random() * (Math.random() * (Math.random() * .01))
     this.memTrainItersCap = r(10)
     let interact = (to, self, cb) => {
       let pack = []
@@ -38,6 +43,7 @@ class LifeBeing extends EventEmitter {
       for (let [lossPerAuthor, lossAuthor] of loss.entries()) {
         if (this.memory.has(lossAuthor)) {
           if (lossPerAuthor < this.memory.get(lossAuthor)) {
+            l('interaction of ', this.name, ' with ', lossAuthor.name, ' on target loss decrease')
             lossAuthor.emit('interactionOffer', this, cb)
           } else {
             if (this.buffer.has(lossAuthor)) this.buffer.delete(lossAuthor)
@@ -54,8 +60,18 @@ class LifeBeing extends EventEmitter {
       this.brain.train(data, [this.target], this.learnConst, this.memTrainItersCap).then(cb).catch(cb)
     })
   }
+  async initiate(startIters, fn) {
+    return new Promise((go, stop) => {
+      let [b, t] = generateBatches(1, this.inputDSize, fn)
+      this.brain.train(b, t, startIters, this.lc)
+      this.brain.predict(b).then(res => {
+        this.buffer.set(this, res)
+        return go()
+      })
+    })
+  }
 }
 
 module.exports = {
-	LifeBeing
+  LearningUnit
 }

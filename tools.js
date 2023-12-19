@@ -34,7 +34,6 @@ const rStr = (length) => {
 	}
 	return result
 }
-
 const fetchTrain = function* (batches, targets) {
 	let i = 0
 	while (true) {
@@ -43,7 +42,6 @@ const fetchTrain = function* (batches, targets) {
 		if (i >= batches.length) i = 0
 	}
 }
-
 const genBitmap = (weights, initial = () => { return Math.random() > .5 ? Math.random() : (Math.random() * -1) }) => {
 	let bitmap = []
 	for (let layer in weights) {
@@ -54,8 +52,7 @@ const genBitmap = (weights, initial = () => { return Math.random() > .5 ? Math.r
 	}
 	return bitmap
 }
-
-const generateBatches = (size = 10000, batchSize = 100, fn) => {
+const generateBatches = (size = 10000, batchSize = 100, batchFn, targetFn) => {
   let batches = []
   let targets = []
   for (let i = 0; i < size; i++) {
@@ -63,13 +60,25 @@ const generateBatches = (size = 10000, batchSize = 100, fn) => {
     let start = Math.floor(Math.random() * (size - batchSize))
     let k = start
     while (k < start + batchSize) {
-      batch.push(fn(k))
+      batch.push(batchFn(k))
       k++
     }
     batches.push(batch)
-    targets.push(fn(k))
+    targets.push(targetFn(batch, k))
   }
   return [batches, targets]
+}
+const normalize = (batch, size) => {
+  let i = 0
+  let k = 0
+  let res = []
+  while (k < size) {
+    res.push(batch[i])
+    i++
+    k++
+    if (i >= batch.length) i = 0
+  }
+  return res
 }
 
 module.exports = {
@@ -82,5 +91,6 @@ module.exports = {
 	rStr,
 	fetchTrain,
 	genBitmap,
-	generateBatches
+	generateBatches,
+  normalize
 }
