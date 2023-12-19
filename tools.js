@@ -1,5 +1,14 @@
 const avg = x => x.reduce((prev, cur) => prev + cur) / x.length
-const measure = (output, target) => output.map((x, i) => x - target[i])
+const measure = (output, target) => output.map((x, i) => {
+  let t = target[i]
+  if (x <= 0) {
+    if (t <= 0) { return Math.abs(Math.abs(x) - Math.abs(t))
+    } else { return Math.abs(x) + t }
+  } else {
+    if (t <= 0) { return Math.abs(t) + x
+    } else { return Math.abs(x - t)}
+  }
+})
 const l = console.log
 const r = x => Math.floor(Math.random() * x)
 const shuffle = (array) => {
@@ -26,9 +35,9 @@ const rStr = (length) => {
 	return result
 }
 
-const fetchTrain = function*(batches, targets) {
+const fetchTrain = function* (batches, targets) {
 	let i = 0
-	while (1 === 1) {
+	while (true) {
 		yield [batches[i], targets[i]]
 		i++
 		if (i >= batches.length) i = 0

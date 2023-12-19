@@ -1,3 +1,6 @@
+const { Layer } = require('./Layer')
+const { LayerStack } = require('./LayerStack')
+
 const testRun = async function(stack, data, iters, name) {
   let [batches, targetsRaw] = data
   let targets = []
@@ -17,14 +20,18 @@ const testRun = async function(stack, data, iters, name) {
   l('testtfirst: ', testTargets[0])
   
   l('RUNNING ', name, ' TEST TRAIN!')
-  await stack.train(trainBatches, trainTargets, iters = iters)
+  await stack.train(trainBatches, trainTargets, iters)
   l('\nTEST ', name, ' TRAIN END\n')
   l('RUNNING ', name, ' PREDICTION: ')
-  /*for (let i = 0; i < testBatches.length; i++) {
+  for (let i = 0; i < testBatches.length; i++) {
     let prediction = await stack.predict(testBatches[i])
     let loss = measure(prediction, [testTargets[i]])
     l('TEST ', name, ' i ', i, ' PREDICTION: ', prediction, ' AGAINST ', testTargets[i], ' LOSS IS: ', loss)
-  }*/
+  }
+}
+
+module.exports = {
+  testRun
 }
 
 const o = async () => {

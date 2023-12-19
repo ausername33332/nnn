@@ -1,14 +1,14 @@
 class Environment {
-  constructor() {
+  constructor(opts) {
     this.data = []
     this.life = []
-    this.dataCap = 10000
-    this.lifeCap = 100
-    this.dataSizeCap = 10
-    this.widthCap = 25
-    this.chunkCap = 100
-    this.lenCap = 5
-    this.fnLenCap = 100
+    this.dataCap = opts?.dataCap || 10000
+    this.lifeCap = opts?.lifeCap || 100
+    this.dataSizeCap = opts?.dataSizeCap || 10
+    this.widthCap = opts?.widthCap || 25
+    this.chunkCap = opts?.chunkCap || 100
+    this.lenCap = opts?.lenCap || 5
+    this.fnLenCap = opts?.fnLenCap || 100
     this.fns = [
       k => k,
       k => k * k,
@@ -73,8 +73,6 @@ class Environment {
     this.tick()
   }
   async fnGenerator() {
-    if (this.fnGenLock) return
-    this.fnGenLock = true
     while (true && (! this.ctxLock)) {
       let fn = rStr(this.fnLenCap)
       let test = `const f=n=>(Number(n)===n);if(!f(${fn}(1))){throw new Error()}`
@@ -90,21 +88,20 @@ class Environment {
   }
   async waveOfRandom() {
     while (true) {
-      this.lifeCap = 100
-      this.dataSizeCap = 10
-      this.widthCap = 25
-      this.chunkCap = 100
       if (Math.random() > .5) { this.dataSizeCap += 1 } else { this.dataSizeCap -= 1 }
       if (Math.random() > .5) { this.widthCap += 1 } else { this.widthCap -= 1 }
       if (Math.random() > .5) { this.chunkCap += 1 } else { this.chunkCap -= 1 }
       if (Math.random() > .5) { this.lenCap += 1 } else { this.lenCap -= 1 }
       if (Math.random() > .5) { this.fnLenCap += 1 } else { this.fnLenCap -= 1 }
       if (Math.random() > .5) {
-        this.ctxLock = true
-        this.ctx = {}
-        vm.createContext(this.ctx)
-        this.ctxLock = false
-        if (! this.fnGenLock) this.fnGenerator()
+        if (! this.fnGenLock) {
+          this.fnGenLock = true
+          this.ctxLock = true
+          this.ctx = {}
+          vm.createContext(this.ctx)
+          this.ctxLock = false
+          this.fnGenerator()
+        }
       }
       if (Math.random() > .5) {
         this.dataCap += 1
@@ -136,4 +133,8 @@ class Environment {
       await Promise.all(promises)
     }
   }
+}
+
+module.exports = {
+  Environment
 }

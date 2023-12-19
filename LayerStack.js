@@ -23,18 +23,18 @@ class LayerStack {
     })
     return weights
   }
-  async train(trainBatches, trainTargets, learnConst = 0.00001, iters = 1000000) {
+  async train(trainBatches, trainTargets, iters = 100000, learnConst = 0.00001) {
     let weights = this.weights
     let prevBitmap = genBitmap(weights)
+    let iter = fetchTrain(trainBatches, trainTargets)
     for (let j = 0; j < iters; j++) {
-      let [batch, target] = fetchTrain(trainBatches, trainTargets).next().value
+      let [batch, target] = iter.next().value
       let bitmap = genBitmap(weights)
       let res = await this.a(batch, bitmap)
       let orig = await this.a(batch, this.weights)
       let loss = measure(res, [target])
       let origLoss = measure(orig, [target])
-      l('b', batch, 't', target, 'r', res, 'o', orig, 'l', loss, 'ol', measure(orig, [target]))
-      l('train at j ', j, 'orig loss: ', origLoss, 'last loss: ', this.lastLoss)
+      if (j % 70 == 0) l('@', j, ': l: ', origLoss[0].toFixed(8), ' t: ', target.toFixed(8), ' o: ', orig[0].toFixed(8), ' lb: ', batch[batch.length - 1].toFixed(8))
       if (j === 0) continue;
       if (loss < this.lastLoss) {
         for (let i in this.layers) {
@@ -72,4 +72,8 @@ class LayerStack {
     if (ans) await this.train([batch], [res])
     return res
   }
+}
+
+module.exports = {
+  LayerStack
 }
