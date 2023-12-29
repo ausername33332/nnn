@@ -1,21 +1,11 @@
-This is an example Node.js project used in Codeanywhere.
+This is unique solution developed from scratch, except getMultipleRandom function, which was fairly stolen from StackOverflow.
 
-[Try it out](https://app.codeanywhere.com/#https://github.com/Codeanywhere-Templates/javascript-node)
-
-### Running the project
+### Input-reduce neural network
 
 Open the terminal and run:
 ```sh
-cd test-project
-npm install
+node main.js
 ```
 
-After installing the dependencies, run:
-```sh
-npm start
-```
-
-Or just press the *Run Code* button found in the top right of the editor panel.
-### Want to contribute?
-
-Feel free to [open a PR](https://github.com/Codeanywhere-Templates/javascript-node) with any suggestions for this test project 😃 
+This will run test from test.js to predict value of pair traded on Kraken, given batches of previous prices.
+Compose any layer sizes, and use any input matrices. This code doesn't use tensor multiply at all, passing reduced input to neuron activation function.
