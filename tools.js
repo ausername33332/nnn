@@ -11,6 +11,16 @@ const measure = (output, target) => output.map((x, i) => {
 })
 const l = console.log
 const r = x => Math.floor(Math.random() * x)
+const isLossCurveSuccessive = (loss) => {
+	let up = 0
+	for (let i = 1; i < loss.length; i++) {
+		if (loss[i] < loss[i - 1]) up++
+	}
+	return (up > (loss.length / 2))
+}
+const getSuccessDelta = (successives) => (successives.reduce((acc, val) => {
+	if (val) acc++
+}) / successives.length)
 const shuffle = (array) => {
 	let currentIndex = array.length, randomIndex
 	while (currentIndex > 0) {
@@ -35,6 +45,13 @@ const rStr = (length) => {
 	return result
 }
 const fetchTrain = function* (batches, targets) {
+	let i = 0
+	while (i < batches.length) {
+		yield [batches[i], targets[i]]
+		i++
+	}
+}
+const fetchInfiniteTrain = function* (batches, targets) {
 	let i = 0
 	while (true) {
 		yield [batches[i], targets[i]]
@@ -86,10 +103,13 @@ module.exports = {
 	measure,
 	l,
 	r,
+	isLossCurveSuccessive,
+	getSuccessDelta,
 	shuffle,
 	getMultipleRandom,
 	rStr,
 	fetchTrain,
+	fetchInfiniteTrain,
 	genBitmap,
 	generateBatches,
   normalize

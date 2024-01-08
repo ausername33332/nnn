@@ -4,7 +4,7 @@ const { Layer } = require('./Layer')
 const { LayerStack } = require('./LayerStack')
 const { generateBatches } = require('./tools')
 
-const testRun = async function(stack, data, iters, name, lc) {
+const testRun = async function(stack, data, iters, name, miniBatchSize, lc) {
   let [batches, targetsRaw] = data
   let targets = []
   let bt = new Map()
@@ -23,7 +23,7 @@ const testRun = async function(stack, data, iters, name, lc) {
   l('testtfirst: ', testTargets[0])
   
   l('RUNNING ', name, ' TEST TRAIN!')
-  await stack.train(trainBatches, trainTargets, iters, lc)
+  await stack.train(trainBatches, trainTargets, iters, miniBatchSize, lc)
   l('\nTEST ', name, ' TRAIN END\n')
   l('RUNNING ', name, ' PREDICTION: ')
   for (let i = 0; i < testBatches.length; i++) {
@@ -38,7 +38,7 @@ const o = async () => {
     new Layer(100),
     new Layer(100),
     new Layer(100),
-    new Layer(1, type = 'bitwise')
+    new Layer(1, type = 'positiveSigmoid')
   ])
   let testStack3 = new LayerStack([
     new Layer(50),
@@ -63,9 +63,9 @@ const o = async () => {
   let targetFn = (batch, k) => input[k]
   let test4batches = generateBatches(data.length, 100, batchFn, targetFn)
   let test5batches = generateBatches(data.length, 50, batchFn, targetFn)
-  l('data', test4batches[0].length, test4batches[1].length, test4batches[0][23], test4batches[1][23])
-  await testRun(testStack1, test4batches, data.length * 10, '100 100 100n layerstack', 0.01)
-  await testRun(testStack3, test5batches, data.length * 10, '50 * 8 n layerstack', 0.0001)
+  l('data2', test4batches[0].length, test4batches[1].length, test4batches[0][23], test4batches[1][23])
+  await testRun(testStack1, test4batches, data.length * 10, '100 100 100n layerstack', 1000, 3)
+  await testRun(testStack3, test5batches, data.length * 10, '50 * 8 n layerstack', 1000, 3)
 
   let test1Batches = generateBatches(10000, 100, x => Math.abs(Math.log(x)))
   //await testRun(testStack1, test1Batches, 10000, 'ln 2 200n 100n layer')
